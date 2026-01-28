@@ -1,7 +1,8 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.176/build/three.module.js';
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.176/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.176/examples/jsm/loaders/GLTFLoader.js';
-import { RGBELoader } from 'https://cdn.jsdelivr.net/npm/three@0.176/examples/jsm/loaders/RGBELoader.js';
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.176.0/+esm';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.176.0/examples/jsm/controls/OrbitControls.js/+esm';
+import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.176.0/examples/jsm/loaders/GLTFLoader.js/+esm';
+import { RGBELoader } from 'https://cdn.jsdelivr.net/npm/three@0.176.0/examples/jsm/loaders/RGBELoader.js/+esm';
+
 
 const scene = new THREE.Scene();
 

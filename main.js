@@ -3,29 +3,48 @@ import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.176.0/exampl
 import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.176.0/examples/jsm/loaders/GLTFLoader.js/+esm';
 import { RGBELoader } from 'https://cdn.jsdelivr.net/npm/three@0.176.0/examples/jsm/loaders/RGBELoader.js/+esm';
 
-
+// ─────────────────────────────────────────────
+// ESCENA
+// ─────────────────────────────────────────────
 const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xffffff); // fondo blanco
 
+// ─────────────────────────────────────────────
+// CÁMARA
+// ─────────────────────────────────────────────
 const camera = new THREE.PerspectiveCamera(
   50,
   window.innerWidth / window.innerHeight,
   0.01,
-  100
+  1000
 );
-camera.position.set(0, 0.8, 1.6);
-camera.lookAt(0, 0.6, 0);
 
+// ─────────────────────────────────────────────
+// RENDERER
+// ─────────────────────────────────────────────
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.physicallyCorrectLights = true;
 document.body.appendChild(renderer.domElement);
 
-// 🎥 Controls
+// ─────────────────────────────────────────────
+// CONTROLES
+// ─────────────────────────────────────────────
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 
-// 🌍 Environment
+// ─────────────────────────────────────────────
+// LUCES BÁSICAS
+// ─────────────────────────────────────────────
+scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+dirLight.position.set(5, 10, 7);
+scene.add(dirLight);
+
+// ─────────────────────────────────────────────
+// ENVIRONMENT (opcional, pero recomendado)
+// ─────────────────────────────────────────────
 const pmrem = new THREE.PMREMGenerator(renderer);
 
 new RGBELoader().load('./studio.hdr', (hdr) => {
@@ -34,62 +53,30 @@ new RGBELoader().load('./studio.hdr', (hdr) => {
   hdr.dispose();
 });
 
-// 💡 Basic Lighting
-scene.add(new THREE.AmbientLight(0xffffff, 0.3));
-scene.background = new THREE.Color(0xffffff);
-
-// 📐 ENCUADRE AUTOMÁTICO
-const box = new THREE.Box3().setFromObject(gltf.scene);
-const size = box.getSize(new THREE.Vector3());
-const center = box.getCenter(new THREE.Vector3());
-
-// Centrar modelo
-gltf.scene.position.sub(center);
-
-// Tamaño máximo
-const maxDim = Math.max(size.x, size.y, size.z);
-
-// Ajustar cámara según FOV
-const fov = camera.fov * (Math.PI / 180);
-let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-
-// Un poco más atrás para margen
-cameraZ *= 1.4;
-
-camera.position.set(0, maxDim * 0.4, cameraZ);
-camera.lookAt(0, 0, 0);
-
-// OrbitControls centrados
-controls.target.set(0, 0, 0);
-controls.update();
-
-// Ajustar planos de clipping
-camera.near = cameraZ / 100;
-camera.far = cameraZ * 100;
-camera.updateProjectionMatrix();
-
-
-// 📦 GLB
+// ─────────────────────────────────────────────
+// CARGA DEL MODELO
+// ─────────────────────────────────────────────
 const loader = new GLTFLoader();
+
 loader.load('./model.glb', (gltf) => {
 
+  // ───── Ajuste de materiales (cristal)
   gltf.scene.traverse((obj) => {
     if (!obj.isMesh) return;
 
     const m = obj.material;
     if (!m) return;
 
-    // 👉 material filter
-    if (!m.name.toLowerCase().includes('glass')) return;
+    // Filtra por nombre de material
+    if (!m.name || !m.name.toLowerCase().includes('glass')) return;
 
-    // 🔮 BETTER GLASS
     m.transparent = true;
     m.transmission = 1.0;
     m.thickness = 0.6;
     m.roughness = 0.1;
     m.ior = 1.45;
 
-    // 🎨 GREEN TINT
+    // Tinte verde botella (ajusta a tu gusto)
     m.color.setRGB(0.1, 0.25, 0.1);
 
     m.depthWrite = false;
@@ -98,22 +85,46 @@ loader.load('./model.glb', (gltf) => {
   });
 
   scene.add(gltf.scene);
+
+  // ───── ENCUADRE AUTOMÁTICO (CLAVE)
+  const box = new THREE.Box3().setFromObject(gltf.scene);
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+
+  // Centrar modelo en el origen
+  gltf.scene.position.sub(center);
+
+  const maxDim = Math.max(size.x, size.y, size.z);
+  const fov = camera.fov * (Math.PI / 180);
+  let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+  cameraZ *= 1.4; // margen
+
+  camera.position.set(0, maxDim * 0.4, cameraZ);
+  camera.lookAt(0, 0, 0);
+
+  controls.target.set(0, 0, 0);
+  controls.update();
+
+  camera.near = cameraZ / 100;
+  camera.far = cameraZ * 100;
+  camera.updateProjectionMatrix();
 });
 
-// 🔁 Resize
+// ─────────────────────────────────────────────
+// RESIZE
+// ─────────────────────────────────────────────
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// 🔄 Loop
+// ─────────────────────────────────────────────
+// LOOP
+// ─────────────────────────────────────────────
 function animate() {
   requestAnimationFrame(animate);
   controls.update();
   renderer.render(scene, camera);
 }
 animate();
-
-
-

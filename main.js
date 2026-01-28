@@ -38,6 +38,37 @@ new RGBELoader().load('./studio.hdr', (hdr) => {
 scene.add(new THREE.AmbientLight(0xffffff, 0.3));
 scene.background = new THREE.Color(0xffffff);
 
+// 📐 ENCUADRE AUTOMÁTICO
+const box = new THREE.Box3().setFromObject(gltf.scene);
+const size = box.getSize(new THREE.Vector3());
+const center = box.getCenter(new THREE.Vector3());
+
+// Centrar modelo
+gltf.scene.position.sub(center);
+
+// Tamaño máximo
+const maxDim = Math.max(size.x, size.y, size.z);
+
+// Ajustar cámara según FOV
+const fov = camera.fov * (Math.PI / 180);
+let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+
+// Un poco más atrás para margen
+cameraZ *= 1.4;
+
+camera.position.set(0, maxDim * 0.4, cameraZ);
+camera.lookAt(0, 0, 0);
+
+// OrbitControls centrados
+controls.target.set(0, 0, 0);
+controls.update();
+
+// Ajustar planos de clipping
+camera.near = cameraZ / 100;
+camera.far = cameraZ * 100;
+camera.updateProjectionMatrix();
+
+
 // 📦 GLB
 const loader = new GLTFLoader();
 loader.load('./model.glb', (gltf) => {
@@ -83,5 +114,6 @@ function animate() {
   renderer.render(scene, camera);
 }
 animate();
+
 
 

@@ -12,7 +12,8 @@ const camera = new THREE.PerspectiveCamera(
   0.01,
   100
 );
-camera.position.set(0, 1, 3);
+camera.position.set(0, 0.8, 1.6);
+camera.lookAt(0, 0.6, 0);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -35,6 +36,7 @@ new RGBELoader().load('./studio.hdr', (hdr) => {
 
 // 💡 Luz de apoyo (opcional)
 scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+scene.background = new THREE.Color(0xffffff);
 
 // 📦 GLB
 const loader = new GLTFLoader();
@@ -81,3 +83,4 @@ function animate() {
   renderer.render(scene, camera);
 }
 animate();
+

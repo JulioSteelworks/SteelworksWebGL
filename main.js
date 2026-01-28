@@ -21,11 +21,11 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.physicallyCorrectLights = true;
 document.body.appendChild(renderer.domElement);
 
-// 🎥 Controles
+// 🎥 Controls
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 
-// 🌍 Environment (MUY IMPORTANTE)
+// 🌍 Environment
 const pmrem = new THREE.PMREMGenerator(renderer);
 
 new RGBELoader().load('./studio.hdr', (hdr) => {
@@ -34,7 +34,7 @@ new RGBELoader().load('./studio.hdr', (hdr) => {
   hdr.dispose();
 });
 
-// 💡 Luz de apoyo (opcional)
+// 💡 Basic Lighting
 scene.add(new THREE.AmbientLight(0xffffff, 0.3));
 scene.background = new THREE.Color(0xffffff);
 
@@ -48,17 +48,17 @@ loader.load('./model.glb', (gltf) => {
     const m = obj.material;
     if (!m) return;
 
-    // 👉 Filtra por nombre del material
+    // 👉 material filter
     if (!m.name.toLowerCase().includes('glass')) return;
 
-    // 🔮 CRISTAL REAL
+    // 🔮 BETTER GLASS
     m.transparent = true;
     m.transmission = 1.0;
     m.thickness = 0.6;
     m.roughness = 0.1;
     m.ior = 1.45;
 
-    // 🎨 TINTE (verde botella)
+    // 🎨 GREEN TINT
     m.color.setRGB(0.1, 0.25, 0.1);
 
     m.depthWrite = false;
@@ -83,4 +83,5 @@ function animate() {
   renderer.render(scene, camera);
 }
 animate();
+
 

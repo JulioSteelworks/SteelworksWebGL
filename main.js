@@ -76,11 +76,11 @@ loader.load('./model.glb', (gltf) => {
       color: 0xffffff,
       roughness: 0.08,
       transmission: 1.0,
-      thickness: 0.5,
+      thickness: 0.3,
       ior: 1.45,
-      attenuationColor: new THREE.Color(1, 0, 0), // verde botella
-      attenuationDistance: 0.05, // 👈 AJUSTA AQUÍ
-      side: THREE.DoubleSide,
+      attenuationColor: new THREE.Color(0.1, 0.25, 0.1), // verde botella
+      attenuationDistance: 0.02, // 👈 AJUSTA AQUÍ
+      side: THREE.FrontSide,
       depthWrite: false
     });
 
@@ -106,7 +106,7 @@ loader.load('./model.glb', (gltf) => {
     m.attenuationDistance = 0.05; // controla intensidad del color
 
     m.depthWrite = false;
-    m.side = THREE.DoubleSide;
+    m.side = THREE.FrontSide;
     m.needsUpdate = true;
   });
 
@@ -154,6 +154,7 @@ function animate() {
   renderer.render(scene, camera);
 }
 animate();
+
 
 
 

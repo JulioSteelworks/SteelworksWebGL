@@ -79,10 +79,10 @@ loader.load('./model.glb', (gltf) => {
     
       transmission: 0.0,      // 👈 CLAVE
       transparent: true,
-      opacity: 0.88,           // 👈 transparencia controlada
+      opacity: 0.5,           // 👈 transparencia controlada
     
       ior: 1.45,               // solo para Fresnel
-      reflectivity: 0.9,
+      reflectivity: 0.5,
     
       side: THREE.FrontSide,
       depthWrite: false
@@ -158,6 +158,7 @@ function animate() {
   renderer.render(scene, camera);
 }
 animate();
+
 
 
 

@@ -69,11 +69,11 @@ loader.load('./model.glb', (gltf) => {
     if (!m) return;
 
     // Filtra por nombre de material
-    if (!m.name || !m.name.toLowerCase().includes('xxx')) return;
+    if (!m.name || !m.name.toLowerCase().includes('green')) return;
 
     m.transparent = true;
     m.transmission = 1.0;
-    m.thickness = 1;
+    m.thickness = 1.0;
     m.roughness = 0.1;
     m.ior = 1.45;
 
@@ -81,8 +81,8 @@ loader.load('./model.glb', (gltf) => {
     m.color.setRGB(1, 1, 1);
 
     // Volumetric tint
-    m.attenuationColor = new THREE.Color(0.1, 0.25, 0.1); // verde botella
-    m.attenuationDistance = 0.01; // controla intensidad del color
+    m.attenuationColor = new THREE.Color(1, 0, 0); // verde botella
+    m.attenuationDistance = 0.05; // controla intensidad del color
 
     m.depthWrite = false;
     m.side = THREE.DoubleSide;
@@ -133,6 +133,7 @@ function animate() {
   renderer.render(scene, camera);
 }
 animate();
+
 
 
 

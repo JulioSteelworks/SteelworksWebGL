@@ -50,7 +50,7 @@ const pmrem = new THREE.PMREMGenerator(renderer);
 new RGBELoader().load('./studio.hdr', (hdr) => {
   const envMap = pmrem.fromEquirectangular(hdr).texture;
   scene.environment = envMap;
-  scene.environmentIntensity = 2.0;
+  scene.environmentIntensity = 1.5;
   hdr.dispose();
 });
 
@@ -133,6 +133,7 @@ function animate() {
   renderer.render(scene, camera);
 }
 animate();
+
 
 
 

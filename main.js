@@ -9,6 +9,11 @@ import { RGBELoader } from 'https://cdn.jsdelivr.net/npm/three@0.176.0/examples/
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xf2f2f2); // fondo blanco
 
+const logoTexture = new THREE.TextureLoader().load('./Coperni_alpha.jpg');
+logoTexture.colorSpace = THREE.SRGBColorSpace;
+logoTexture.flipY = false; // importante para glTF
+
+
 // ─────────────────────────────────────────────
 // CAMERA
 // ─────────────────────────────────────────────
@@ -88,6 +93,15 @@ loader.load('./model.glb', (gltf) => {
 		side: THREE.FrontSide,
 		depthWrite: false
 	  });
+
+	// 👉 LOGO BLANCO SERIGRAFIADO (AQUÍ SÍ)
+	sunglassLensMaterial.emissiveMap = logoTexture;
+	sunglassLensMaterial.emissive = new THREE.Color(1, 1, 1);
+	sunglassLensMaterial.emissiveIntensity = 0.6;
+
+	// Mantener maps originales si existen
+	sunglassLensMaterial.normalMap = m.normalMap || null;
+	sunglassLensMaterial.map = m.map || null;
 
 
     // Mantener maps si los hubiera

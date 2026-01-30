@@ -17,7 +17,7 @@ const cameras = {};
 
 
 // ─────────────────────────────────────────────
-// CAMERA
+// CAMERAS
 // ─────────────────────────────────────────────
 const camera = new THREE.PerspectiveCamera(
   50,
@@ -25,6 +25,9 @@ const camera = new THREE.PerspectiveCamera(
   0.01,
   1000
 );
+
+const cameraTargets = {};
+
 
 // ─────────────────────────────────────────────
 // ACTIVE CAMERA + TRANSITION STATE
@@ -79,28 +82,29 @@ new RGBELoader().load('./studio.hdr', (hdr) => {
 });
 
 function smoothSwitchCamera(name) {
-  const target = cameras[name];
+  const target = cameraTargets[name];
   if (!target) {
     console.warn('Camera not found:', name);
     return;
   }
 
-  // Guardar estado inicial
   transition.fromPos.copy(activeCamera.position);
   transition.fromQuat.copy(activeCamera.quaternion);
 
-  // Copiar estado DESTINO desde la cámara del GLB
-  transition.toPos.copy(target.getWorldPosition(new THREE.Vector3()));
-  transition.toQuat.copy(target.getWorldQuaternion(new THREE.Quaternion()));
+  transition.toPos.copy(target.position);
+  transition.toQuat.copy(target.quaternion);
 
   transition.startTime = performance.now();
   transition.active = true;
 
-  // 👉 SOLO Cam_Free permite interacción
+  // 👉 Controles
   if (name === 'Cam_Free') {
     controls.enabled = true;
+    controls.target.set(0, 0, 0);
   } else {
     controls.enabled = false;
+	controls.reset();
+
   }
 }
 
@@ -108,8 +112,9 @@ function smoothSwitchCamera(name) {
 
 
 
+
 // ─────────────────────────────────────────────
-// LOAD MODEL
+// LOADER
 // ─────────────────────────────────────────────
 const loader = new GLTFLoader();
 
@@ -121,6 +126,19 @@ loader.load('./model.glb', (gltf) => {
 		cameras[obj.name] = obj;
 	  }
 	});
+	
+	gltf.scene.traverse((obj) => {
+	  if (obj.isCamera) {
+		cameras[obj.name] = obj;
+
+		// 🔒 Cachear transformaciones ORIGINALES
+		cameraTargets[obj.name] = {
+		  position: obj.getWorldPosition(new THREE.Vector3()),
+		  quaternion: obj.getWorldQuaternion(new THREE.Quaternion())
+		};
+	  }
+	});
+
 
 
   // ───── Ajuste de materiales (cristal)
